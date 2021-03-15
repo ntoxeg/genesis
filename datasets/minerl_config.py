@@ -56,20 +56,18 @@ def load(cfg, **unused_kwargs):
         cfg.num_workers = 1
 
     del unused_kwargs
-    if not os.path.exists(cfg.data_folder):
-        raise Exception("Data folder does not exist.")
     print(f"Using {cfg.num_workers} data workers.")
     # Create data iterators
     train_loader = MineRLLoader(
-        data_folder=cfg.data_folder, mode='devel_train', img_size=cfg.img_size,
+        mode='devel_train', img_size=cfg.img_size,
         val_frac=cfg.val_frac, batch_size=cfg.batch_size,
         num_workers=cfg.num_workers, buffer_size=cfg.buffer_size)
     val_loader = MineRLLoader(
-        data_folder=cfg.data_folder, mode='devel_val', img_size=cfg.img_size,
+        mode='devel_val', img_size=cfg.img_size,
         val_frac=cfg.val_frac, batch_size=cfg.batch_size,
         num_workers=cfg.num_workers, buffer_size=cfg.buffer_size)
     test_loader = MineRLLoader(
-        data_folder=cfg.data_folder, mode='test', img_size=cfg.img_size,
+        mode='test', img_size=cfg.img_size,
         val_frac=cfg.val_frac, batch_size=1,
         num_workers=1, buffer_size=cfg.buffer_size)
 
@@ -87,8 +85,9 @@ def _make_iterator(reader, batch_size):
 class MineRLLoader():
     """MineRL dataset"""
 
-    def __init__(self, data_folder, mode, img_size, val_frac, batch_size,
+    def __init__(self, mode, img_size, val_frac, batch_size,
                  num_workers, buffer_size):
+        self.data_folder = os.environ["MINERL_DATA_ROOT"]
         self.img_size = img_size
         self.batch_size = batch_size
 
