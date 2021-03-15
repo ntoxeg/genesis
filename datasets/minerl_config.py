@@ -16,11 +16,8 @@ import os
 import torch
 import torch.nn.functional as F
 
-import tensorflow as tf
-
 import numpy as np
 
-import third_party.tf_gqn.gqn_tfr_provider as gqn
 import minerl
 
 from forge import flags
@@ -29,8 +26,6 @@ from forge.experiment_tools import fprint
 from utils.misc import loader_throughput
 
 
-# flags.DEFINE_string('data_folder', 'data/gqn_datasets',
-#                     'Path to data folder.')
 flags.DEFINE_integer('img_size', 64,
                      'Dimension of images. Images are square.')
 flags.DEFINE_integer('val_frac', 60,
@@ -49,10 +44,9 @@ def load(cfg, **unused_kwargs):
     # Fix TensorFlow seed
     global SEED
     SEED = cfg.seed
-    tf.set_random_seed(SEED)
 
     if cfg.num_workers == 0:
-        fprint("Need to use at least one worker for loading tfrecords.")
+        fprint("Need to use at least one worker for loading.")
         cfg.num_workers = 1
 
     del unused_kwargs
@@ -91,12 +85,14 @@ class MineRLLoader():
         self.img_size = img_size
         self.batch_size = batch_size
 
-        if "train" in mode:
-            self.reader = minerl.data.make('MineRLNavigateDense-v0')
-        elif "test" in mode:
-            self.reader = minerl.data.make("MineRLObtainDiamond-v0")
-        else:
-            self.reader = minerl.data.make("MineRLTreechop-v0")
+        #  if "train" in mode:
+            #  self.reader = minerl.data.make('MineRLNavigateDense-v0')
+        #  elif "test" in mode:
+            #  self.reader = minerl.data.make("MineRLObtainDiamond-v0")
+        #  else:
+            #  self.reader = minerl.data.make("MineRLTreechop-v0")
+
+        self.reader = minerl.data.make("MineRLObtainDiamond-v0")
 
         self._iter = _make_iterator(self.reader, self.batch_size)
         # TODO: avoid hard coding these
